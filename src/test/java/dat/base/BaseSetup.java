@@ -2,6 +2,10 @@ package dat.base;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Parameters;
 
 public class BaseSetup {
     static String driverPath = "resources\\drivers\\";
@@ -19,10 +23,8 @@ public class BaseSetup {
                 break;
             default:
                 System.out.println("browser : " + browserType + " is invalid, Launching Chrome as browser of choice..");
-                driver = new ChromeDriver();
+                driver = initChromeDriver(appURL);
         }
-        driver.manage().window().maximize();
-        driver.initChromeDriver(appURL);
     }
 
     //khởi tạo cấu hình của các browser để đưa vào switch case
@@ -33,5 +35,27 @@ public class BaseSetup {
         driver.get(appURL);
         return driver;
     }
-    //25phut18s video32
+    private  WebDriver initFirefoxDriver(String appURL){
+        System.out.println("Launching Firefox browser..");
+       // System.setProperty("webdriver.gecko.driver", driverPath + "geckodriver.exe");
+        driver = new FirefoxDriver();
+        driver.get(appURL);
+        return driver;
+    }
+    // chạy hàm initializeTestBaseSetUp truocuoc khi class nay dc goi
+    @Parameters({"browserType","appURL"})
+    @BeforeClass
+    public void initializeTestBaseSetUp(String browserType, String appURL) {
+        try {
+            setDriver(browserType, appURL);
+        }catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
+    @AfterClass
+    public void tearDown() throws InterruptedException {
+        Thread.sleep(2000);
+        driver.quit();
+    }
+
 }
